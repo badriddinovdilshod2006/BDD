@@ -1,64 +1,56 @@
-# 🎯 Quiz Bot — APK yasash yo'riqnomasi
+name: Build APK
 
-**by Dilshod Badriddinov**
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
----
+jobs:
+  build:
+    runs-on: ubuntu-22.04
 
-## 📱 Tayyor APK olish — 5 qadam
+    steps:
+    - uses: actions/checkout@v3
 
-### 1️⃣ GitHub account oching
-👉 https://github.com/signup — bepul ro'yxatdan o'ting
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3-pip \
+          build-essential \
+          git \
+          ffmpeg \
+          libsdl2-dev \
+          libsdl2-image-dev \
+          libsdl2-mixer-dev \
+          libsdl2-ttf-dev \
+          libportmidi-dev \
+          libswscale-dev \
+          libavformat-dev \
+          libavcodec-dev \
+          zlib1g-dev \
+          libgstreamer1.0 \
+          gstreamer1.0-plugins-base \
+          gstreamer1.0-plugins-good \
+          openjdk-17-jdk \
+          unzip \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          cmake
+        pip3 install buildozer cython
 
-### 2️⃣ Yangi repository yarating
-1. GitHub ga kiring
-2. Yuqori o'ngda **"+"** → **"New repository"**
-3. Nom: `quizbot` (yoki xohlagan nom)
-4. **"Public"** tanlang
-5. **"Create repository"** bosing
+    - name: Setup Android SDK
+      run: |
+        buildozer android update
 
-### 3️⃣ Fayllarni yuklang
-Repository ichida:
-1. **"uploading an existing file"** bosing
-2. Quyidagi fayllarni yuklang (barchasini tanlang):
-   - `main.py`
-   - `buildozer.spec`
-   - `.github/workflows/build.yml`  ← bu papka bilan birga
-3. **"Commit changes"** bosing
+    - name: Build APK
+      run: |
+        buildozer -v android debug
 
-### 4️⃣ Build avtomatik boshlanadi!
-1. **"Actions"** tabiga kiring
-2. "Build APK" ishini ko'rasiz — sariq doira = ishlayapti ⏳
-3. 15-25 daqiqa kuting (birinchi marta uzoq bo'ladi)
-4. Yashil belgi = tayyor ✅
-
-### 5️⃣ APK ni yuklab oling
-1. Actions → "Build APK" → oxirgi run
-2. Pastda **"Artifacts"** bo'limi
-3. **"QuizBot-APK"** ni bosing — ZIP yuklanadi
-4. ZIP ni oching → `quizbot-debug.apk`
-
----
-
-## 📲 Telefoningizga o'rnatish
-
-1. APK faylni telefoningizga yuboring (Telegram, USB, yoki Google Drive)
-2. Telefonda APK ni oching
-3. **"Noma'lum manbadan o'rnatish"** so'ralsa — **Ruxsat bering**
-4. **"O'rnatish"** bosing
-
-> ⚠️ Android 15 da: Sozlamalar → Ilovalar → Maxsus ruxsatlar → Noma'lum manbalar
-
----
-
-## 🗂️ Word fayl ishlatish
-
-1. `.docx` faylni telefoningizga saqlang (Downloads papkasiga)
-2. Ilovada **📂** tugmasini bosing
-3. Faylni toping va tanlang
-4. Interval tanlang → Test boshlang!
-
----
-
-## ❓ Yordam kerakmi?
-
-Muammo bo'lsa Actions → "Build APK" → log ni ko'ring va xatoni yuboring.
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: QuizBot-APK
+        path: bin/*.apk
